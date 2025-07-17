@@ -19,6 +19,7 @@ module pc (
             pc <= 32'h0000_0000; // Reset to address 0
         else
             // TODO: Update PC with pc_next on clock edge
+            pc <= pc_next;
     end
 
 endmodule
