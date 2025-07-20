@@ -21,10 +21,12 @@ module riscv_processor (
     // TODO: Declare additional internal signals like:
     // rd1, rd2, imm_ext, src_a, src_b, alu_result, read_data, result
     // zero, pc_src, reg_write, alu_src, mem_write, etc.
-    logic [31:0] rd1, rd2, imm_ext, src_a, src_b, alu_result, read_data, result;
+    logic [31:0] rd1, rd2, imm_ext, src_a, src_b, alu_result, read_data, result, 
+                 reg_wdata;
     logic zero, pc_src, reg_write, alu_src, mem_write, reg_dest;
-    // PC logic
-    assign pc_next = pc + 4; // TODO: Replace with branch/jump-aware logic
+    
+    logic [3:0] alu_control;
+    logic mem_to_reg, branch, jump;
 
     // Debug outputs
     assign pc_out = pc;
@@ -52,7 +54,8 @@ module riscv_processor (
         .we(reg_write),
         .rs1(instruction[19:15]),
         .rs2(instruction[24:20]),
-        .rd(instruction[11:7]),
+        .rd(instruction[11:7]), 
+        .wd(reg_wdata),
         .rd1(rd1),
         .rd2(rd2)
     );
@@ -121,11 +124,10 @@ module riscv_processor (
         if (pc_src) begin
             pc_next = pc + imm_ext; // Branch target address
         end else if (jump) begin
-            pc_next = {pc[31:28], instruction[25:0], 2'b00}; // Jump address
+            pc_next = {instruction[20], instruction[12:19], instruction[20], instruction[21:30], 1'b1}; // Jump address
         end else begin
             pc_next = pc + 4; // Default next PC
         end
-
-
-
+    end
+    always_comb begin
 endmodule
